@@ -1,39 +1,43 @@
 from src.agents.base_agent import BaseAgent
 from src.graph.state import AgentState
-from src.llm.llm_loader import OpenSourceLLM
-from src.llm.prompts import GENERATOR_PROMPT
-from src.utils.device import resolve_device
+import time
+from src.llm.factory import create_llm
 from src.utils.config_loader import load_yaml
-
+from src.llm.prompts import GENERATOR_PROMPT
 
 class GeneratorAgent(BaseAgent):
     name = "GeneratorAgent"
 
     def __init__(self):
-        cfg = load_yaml("configs/models.yaml")["generator"]
-        device = resolve_device(cfg["device"])
+        print(">>> [GeneratorAgent] __init__ started")
 
-        self.llm = OpenSourceLLM(
-            model_name=cfg["model_name"],
-            device=device,
-            max_new_tokens=cfg["max_new_tokens"],
-        )
+        cfg = load_yaml("configs/models.yaml")["generator"]
+        self.llm = create_llm(cfg)
+        print(">>> [GeneratorAgent] model loaded successfully")
 
     def run(self, state: AgentState) -> AgentState:
         self.log(state, "Generating summary using LLM")
 
-        # Demo sources
-        sources_text = """
-        - Open-source LLM adoption is increasing
-        - Multi-agent systems are gaining popularity
-        - Observability is becoming critical in AI systems
-        """
+        print(">>> [GeneratorAgent] Entered run()")
+        print(">>> [GeneratorAgent] Preparing prompt")
 
+        sources_text = "\n".join(
+            f"- {item['title']}: {item['summary']}"
+            for item in state.sources
+        )
         prompt = GENERATOR_PROMPT.format(sources=sources_text)
 
-        output = self.llm.generate(prompt)
+        print(">>> [GeneratorAgent] entering model.generate()")
 
-        # Extract only summary part
-        state.summary = output.split("Summary:")[-1].strip()
+        start_time = time.time()
+        output = self.llm.generate(prompt)
+        elapsed = time.time() - start_time
+
+        print(f">>> [GeneratorAgent] model.generate() finished in {elapsed:.2f} seconds")
+
+        state.summary = output.strip()
+
+        print(">>> [GeneratorAgent] Summary set, exiting run()")
 
         return state
+    

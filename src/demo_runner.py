@@ -32,6 +32,13 @@ def main():
     for log in final_state.logs:
         print(log)
 
+    reddit_sources = [
+    s for s in final_state.sources
+    if s["source"].startswith("reddit:")
+    ]
+
+    print(f"Reddit sources used: {len(reddit_sources)}")
+
 
 if __name__ == "__main__":
     main()

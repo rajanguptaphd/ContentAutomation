@@ -1,9 +1,11 @@
 generator:
-  model_name: Qwen/Qwen2.5-1.5B-Instruct
-  device: cpu
-  max_new_tokens: 150
+  backend: ollama          # hf | ollama
+  model_name: qwen2.5:1.5b-instruct
+  device: cpu              # hf only
+  max_new_tokens: 80
 
 validator:
-  model_name: Qwen/Qwen2.5-1.5B-Instruct
+  backend: ollama
+  model_name: qwen2.5:1.5b-instruct
   device: cpu
-  max_new_tokens: 80
+  max_new_tokens: 40

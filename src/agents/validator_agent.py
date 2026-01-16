@@ -1,24 +1,21 @@
 from src.agents.base_agent import BaseAgent
 from src.graph.state import AgentState
-from src.llm.llm_loader import OpenSourceLLM
-from src.llm.prompts import VALIDATOR_PROMPT
-from src.utils.device import resolve_device
 from src.utils.config_loader import load_yaml
+from src.llm.factory import create_llm
+from src.llm.prompts import VALIDATOR_PROMPT
 
 
 class ValidatorAgent(BaseAgent):
     name = "ValidatorAgent"
 
     def __init__(self):
+        print(">>> [ValidatorAgent] __init__ started")
+
         cfg = load_yaml("configs/models.yaml")["validator"]
-        device = resolve_device(cfg["device"])
+        self.llm = create_llm(cfg)
 
-        self.llm = OpenSourceLLM(
-            model_name=cfg["model_name"],
-            device=device,
-            max_new_tokens=cfg["max_new_tokens"],
-        )
-
+        print(">>> [ValidatorAgent] model loaded successfully")
+        
     def run(self, state: AgentState) -> AgentState:
         self.log(state, "Validating summary using LLM")
 

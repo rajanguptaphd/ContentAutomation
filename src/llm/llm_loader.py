@@ -17,7 +17,7 @@ class OpenSourceLLM:
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float16 if device != "cpu" else torch.float32,
+            dtype=torch.float16 if device != "cpu" else torch.float32,
         )
 
         self.model.to(device)
